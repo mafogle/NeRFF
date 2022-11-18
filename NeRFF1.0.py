@@ -21,15 +21,15 @@ document_path = Path(__file__).parent / "residential_fiber_paperwork.docx"
 doc = DocxTemplate(document_path)
 
 today = datetime.datetime.today()
-installationFee = float(99.00)
-paperBillingFee = float(4)
-fiber100 = float(49.95)
-fiber500 = float(69.95)
-fiber1000 = float(79.95)
-voipBundle = float(19.95)
-smartWifi = float(5.00)
-wifiExtender = float(6.95)
-
+installationFee = 99.00
+paperBillingFee = 4
+fiber100 = 49.95
+fiber500 = 69.95
+fiber1000 = 79.95
+voipBundle = 19.95
+smartWifi = 5.00
+wifiExtender = 6.95
+salesTax = 0.07
 
 layout1 = [[sg.Text('Customer Information')],
            [sg.Text("First Name:"), sg.Input(
@@ -70,6 +70,13 @@ layout1 = [[sg.Text('Customer Information')],
            ]
 
 layout2 = [[sg.Text('Service Information')],
+           [sg.Text('Installation Date')],
+           [sg.Text("Month XX:"),
+            sg.Input(key="installMonth", do_not_clear=True)],
+           [sg.Text("Day XX:"),
+            sg.Input(key="installDay", do_not_clear=True)],
+           [sg.Text("Year XXXX:"),
+            sg.Input(key="installYear", do_not_clear=True)], 
            [sg.Text('Service Level:')],
            [sg.CB('Fiber 100 $49.95/mo', key='fiber100')],
            [sg.CB('Fiber 500 $69.95/mo', key='fiber500')],
@@ -95,6 +102,7 @@ layout2 = [[sg.Text('Service Information')],
                key="addItemPrice3", do_not_clear=True)],
            ]
 
+
 layout3 = [[sg.Text('Property Information')]]
 
 # ----------- Create actual layout using Columns and a row of Buttons
@@ -106,6 +114,7 @@ layout = [[sg.Column(layout1, key='-COLCustomer Information-'), sg.Column(layout
 window = sg.Window("New Residential Fiber Form", layout,
                    element_justification="right")
 
+#Variable declaration to denote page for Buttons
 page = "Customer Information"
 
 """while True:
@@ -165,6 +174,58 @@ while True:
             values['paymentMethod'] = str('E-Statements')
         if values['paperBilling'] == True:
             values['paymentMethod'] = str('Paper, $4/mo fee')
+
+    #Tabulation of totals
+        if values['fiber100'] == str('Fiber 100 $49.95/mo'):
+            fiberRate = fiber100
+        if values['fiber500'] == True:
+            fiberRate = fiber500
+        if values['fiber1000'] == True:
+            fiberRate = fiber1000
+        if values['smartWifi'] == True:
+            smartWifi = 5.00
+        if values['smartWifi'] == False:
+            smartWifi = 0
+        if values['wifiExtender'] == True:
+            wifiExtender = 6.95
+        if values['wifiExtender'] == False:
+            wifiExtender = 0
+        if values['voipService'] == False:
+            voipBundle = 0
+        if values['addItemPrice1'] == None:
+            addItem1 = 0
+        if values['addItemPrice2'] == None:
+            addItem2 = 0
+        if values['addItemPrice3'] == None:
+            addItem3 = 0
+        if values['addItemPrice1'] != None:
+            addItem1 = values['addItemPrice1']
+            addItem1 = float(addItem1)
+        if values['addItemPrice2'] != None:
+            addItem2 = values['addItemPrice2']
+            addItem2 = float(addItem2)
+        if values['addItemPrice3'] != None:
+            addItem3 = values['addItemPrice3']
+            addItem3 = float(addItem3)
+
+        #BIG CALENDAR MATH O.O
+        
+        installMonth = int(values['installMonth'])
+        installDay = int(values['installDay'])
+        installYear = int(values['installYear'])
+
+        installMonthLastDay = datetime.date(installYear + installMonth // 12, 
+              installMonth % 12 + 1, 1) - datetime.timedelta(1)
+        installMonthLastDay = int(installMonthLastDay.strftime("%d"))
+        proRateDays = installMonthLastDay - installDay + 1
+
+        #Tabulation
+        dailyRate = (fiberRate + smartWifi + wifiExtender + voipBundle) / installMonthLastDay
+        additionalItemsTotal = (addItem1 + addItem2 + addItem3) *(1 + salesTax)
+        values['firstMonthService'] = dailyRate * proRateDays
+        values['totalSalesTax'] = (addItem1 + addItem2 + addItem3) * salesTax
+        values['installTotal'] = values['firstMonthService'] + installationFee + additionalItemsTotal
+
 
         # Render the template, save new word document & inform user
         doc.render(values)
