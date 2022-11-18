@@ -169,8 +169,7 @@ while True:
         # Render the template, save new word document & inform user
         doc.render(values)
 
-        output_path = Path(
-            __file__).parent / f"{values['customerFirstName'] + values['customerLastName']}-FiberAgreement.docx"
+        output_path = Path('Z:/Contracts/Fiber/NeRFF Agreements')/ f"{values['customerFirstName'] + values['customerLastName']}-FiberAgreement.docx"
         doc.save(output_path)
         sg.popup("File saved", f"File has been saved here: {output_path}")
 
