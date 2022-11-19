@@ -118,16 +118,6 @@ window = sg.Window("New Residential Fiber Form", layout,
 #Variable declaration to denote page for Buttons
 page = "Customer Information"
 
-"""while True:
-    event, values = window.read()
-    print(event, values)
-    if event in (None, 'Exit'):
-        break
-    if event in 'Customer Information Service Information Property Information':
-        window[f'-COL{layout}-'].update(visible=False)
-        layout = str(event)
-        window[f'-COL{layout}-'].update(visible=True)
-   """
 while True:
     event, values = window.read()
     if event == sg.WIN_CLOSED or event == "Exit":
@@ -201,7 +191,7 @@ while True:
             addItem2 = 0
         if values["addItemPrice3"] == None:
             addItem3 = 0
-            #Error converting string to float starting here
+        #Error converting string to float starting here
         if values["addItemPrice1"] != None:
             addItem1 = values["addItemPrice1"]
             addItem1 = float(addItem1)
@@ -234,7 +224,7 @@ while True:
         values['installTotal'] = values['firstMonthService'] + installationFee + additionalItemsTotal
 
 
-        # Render the template, save new word document & inform user
+        #Render the template, save new word document & inform user
         doc.render(values)
 
         #Live version path
