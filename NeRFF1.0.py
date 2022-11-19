@@ -26,6 +26,7 @@ paperBillingFee = 4
 fiber100 = 49.95
 fiber500 = 69.95
 fiber1000 = 79.95
+fiberRate = 
 voipBundle = 19.95
 smartWifi = 5.00
 wifiExtender = 6.95
@@ -131,13 +132,15 @@ while True:
     event, values = window.read()
     if event == sg.WIN_CLOSED or event == "Exit":
         break
+    #Layout selector
     if event in 'Customer InformationService InformationProperty Information':
         window[f'-COL{page}-'].update(visible=False)
         page = str(event)
         window[f'-COL{page}-'].update(visible=True)
     elif event == "Create Form":
+    #Prints today's date as MM/DD/YYYY format    
         values["intakeDate"] = today.strftime("%m-%d-%Y")
-    # service Plan section
+    #Determines what services get printed to the agreement
         if values['smartWifi'] == True:
             values['smartWifi'] = str('X')
         else:
@@ -163,7 +166,7 @@ while True:
         else:
             values['voipService'] = str(' ')
 
-    # Method of Billing
+    #Prints method of Billing
 
         if values['creditCard'] == True:
             values['paymentMethod'] = str('Credit Card')
@@ -175,7 +178,7 @@ while True:
         if values['paperBilling'] == True:
             values['paymentMethod'] = str('Paper, $4/mo fee')
 
-    #Tabulation of totals
+    #Defines variables used in Tabulation
         if values['fiber100'] == str('Fiber 100 $49.95/mo'):
             fiberRate = fiber100
         if values['fiber500'] == True:
@@ -192,34 +195,38 @@ while True:
             wifiExtender = 0
         if values['voipService'] == False:
             voipBundle = 0
-        if values['addItemPrice1'] == None:
+        if values["addItemPrice1"] == None:
             addItem1 = 0
-        if values['addItemPrice2'] == None:
+        if values["addItemPrice2"] == None:
             addItem2 = 0
-        if values['addItemPrice3'] == None:
+        if values["addItemPrice3"] == None:
             addItem3 = 0
-        if values['addItemPrice1'] != None:
-            addItem1 = values['addItemPrice1']
+            #Error converting string to float starting here
+        if values["addItemPrice1"] != None:
+            addItem1 = values["addItemPrice1"]
             addItem1 = float(addItem1)
-        if values['addItemPrice2'] != None:
-            addItem2 = values['addItemPrice2']
+        if values["addItemPrice2"] != None:
+            addItem2 = values["addItemPrice2"]
             addItem2 = float(addItem2)
-        if values['addItemPrice3'] != None:
-            addItem3 = values['addItemPrice3']
+        if values["addItemPrice3"] != None:
+            addItem3 = values["addItemPrice3"]
             addItem3 = float(addItem3)
 
         #BIG CALENDAR MATH O.O
         
+        #input data type conversion for math
         installMonth = int(values['installMonth'])
         installDay = int(values['installDay'])
         installYear = int(values['installYear'])
 
+        #calculation for last day of installMonth and data type conversion
         installMonthLastDay = datetime.date(installYear + installMonth // 12, 
               installMonth % 12 + 1, 1) - datetime.timedelta(1)
         installMonthLastDay = int(installMonthLastDay.strftime("%d"))
         proRateDays = installMonthLastDay - installDay + 1
 
         #Tabulation
+        #Error says fiberRate is undefined
         dailyRate = (fiberRate + smartWifi + wifiExtender + voipBundle) / installMonthLastDay
         additionalItemsTotal = (addItem1 + addItem2 + addItem3) *(1 + salesTax)
         values['firstMonthService'] = dailyRate * proRateDays
@@ -230,30 +237,13 @@ while True:
         # Render the template, save new word document & inform user
         doc.render(values)
 
-        output_path = Path('Z:/Contracts/Fiber/NeRFF Agreements')/ f"{values['customerFirstName'] + values['customerLastName']}-FiberAgreement.docx"
+        #Live version path
+        #output_path = Path('Z:/Contracts/Fiber/NeRFF Agreements')/ f"{values['customerFirstName'] + values['customerLastName']}-FiberAgreement.docx"
+        
+        #Work from home path
+        output_path = Path('C:/Users/matth/OneDrive/Desktop')/ f"{values['customerFirstName'] + values['customerLastName']}-FiberAgreement.docx"
+        "C:\Users\matth\OneDrive\Desktop"
         doc.save(output_path)
         sg.popup("File saved", f"File has been saved here: {output_path}")
 
-    """output_path = Path(__file__).parent / f"{values['customerFirstName'] + values['customerLastName']}-FiberAgreement.docx"
-    doc.save(output_path)
-    sg.popup("File saved", f"File has been saved here: {output_path}")"""
-
 window.close()
-
-""" 
-   if event in 'Customer Information':
-        window[f'-COLService Information-'].update(visible=False)
-        window[f'-COLProperty Information-'].update(visible=False)
-        layout = layout1
-        window[f'-COLCustomer Information-'].update(visible=True)
-    if event in 'Service Information':
-        window[f'-COLCustomer Information-'].update(visible=False)
-        window[f'-COLProperty Information-'].update(visible=False)
-        layout = layout2
-        window[f'-COLService Information-'].update(visible=True)
-    if event in 'Property Information':
-        window[f'-COLCustomer Information-'].update(visible=False)
-        window[f'-COLService Information-'].update(visible=False)
-        layout = layout3
-        window[f'-COLProperty Information-'].update(visible=True)   
-"""
