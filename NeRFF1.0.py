@@ -26,7 +26,6 @@ paperBillingFee = 4
 fiber100 = 49.95
 fiber500 = 69.95
 fiber1000 = 79.95
-fiberRate = 
 voipBundle = 19.95
 smartWifi = 5.00
 wifiExtender = 6.95
@@ -128,8 +127,10 @@ while True:
         page = str(event)
         window[f'-COL{page}-'].update(visible=True)
     elif event == "Create Form":
+    
     #Prints today's date as MM/DD/YYYY format    
         values["intakeDate"] = today.strftime("%m-%d-%Y")
+    
     #Determines what services get printed to the agreement
         if values['smartWifi'] == True:
             values['smartWifi'] = str('X')
@@ -148,7 +149,7 @@ while True:
         else:
             values['fiber500'] = str(' ')
         if values['fiber1000'] == True:
-            values['fiber1000'] = str('Fiber 1000 $79.95/mo')
+            values['fiber1000'] = str('Fiber 1GB $79.95/mo')
         else:
             values['fiber1000'] = str(' ')
         if values['voipService'] == True:
@@ -171,9 +172,9 @@ while True:
     #Defines variables used in Tabulation
         if values['fiber100'] == str('Fiber 100 $49.95/mo'):
             fiberRate = fiber100
-        if values['fiber500'] == True:
+        if values['fiber500'] == ('Fiber 500 $69.95/mo'):
             fiberRate = fiber500
-        if values['fiber1000'] == True:
+        if values['fiber1000'] == ('Fiber 1000 $79.95/mo'):
             fiberRate = fiber1000
         if values['smartWifi'] == True:
             smartWifi = 5.00
@@ -185,20 +186,19 @@ while True:
             wifiExtender = 0
         if values['voipService'] == False:
             voipBundle = 0
-        if values["addItemPrice1"] == None:
+        if values["addItemPrice1"] == str(''):
             addItem1 = 0
-        if values["addItemPrice2"] == None:
+        if values["addItemPrice2"] == str(''):
             addItem2 = 0
-        if values["addItemPrice3"] == None:
+        if values["addItemPrice3"] == str(''):
             addItem3 = 0
-        #Error converting string to float starting here
-        if values["addItemPrice1"] != None:
+        if values["addItemPrice1"] != str(''):
             addItem1 = values["addItemPrice1"]
             addItem1 = float(addItem1)
-        if values["addItemPrice2"] != None:
+        if values["addItemPrice2"] != str(''):
             addItem2 = values["addItemPrice2"]
             addItem2 = float(addItem2)
-        if values["addItemPrice3"] != None:
+        if values["addItemPrice3"] != str(''):
             addItem3 = values["addItemPrice3"]
             addItem3 = float(addItem3)
 
@@ -216,23 +216,26 @@ while True:
         proRateDays = installMonthLastDay - installDay + 1
 
         #Tabulation
-        #Error says fiberRate is undefined
         dailyRate = (fiberRate + smartWifi + wifiExtender + voipBundle) / installMonthLastDay
         additionalItemsTotal = (addItem1 + addItem2 + addItem3) *(1 + salesTax)
-        values['firstMonthService'] = dailyRate * proRateDays
+        values['firstMonthService'] = round(dailyRate * proRateDays, 2)
         values['totalSalesTax'] = (addItem1 + addItem2 + addItem3) * salesTax
-        values['installTotal'] = values['firstMonthService'] + installationFee + additionalItemsTotal
+        values['installTotal'] = round(values['firstMonthService'] + installationFee + additionalItemsTotal, 2)
 
 
         #Render the template, save new word document & inform user
         doc.render(values)
 
-        #Live version path
-        #output_path = Path('Z:/Contracts/Fiber/NeRFF Agreements')/ f"{values['customerFirstName'] + values['customerLastName']}-FiberAgreement.docx"
+        Live version path
+        output_path = Path('Z:/Contracts/Fiber/NeRFF Agreements')/ f"{values['customerFirstName'] + values['customerLastName']}-FiberAgreement.docx"
         
-        #Work from home path
-        output_path = Path('C:/Users/matth/OneDrive/Desktop')/ f"{values['customerFirstName'] + values['customerLastName']}-FiberAgreement.docx"
-        "C:\Users\matth\OneDrive\Desktop"
+        #Work from home path, desktop
+        # output_path = Path('C:/Users/matth/OneDrive/Desktop')/ f"{values['customerFirstName'] + values['customerLastName']}-FiberAgreement.docx"
+        # "C:\Users\matth\OneDrive\Desktop"
+
+        #Laptop path, "C:/Users/matth/Desktop"
+        #output_path = Path('C:/Users/matth/Desktop')/ f"{values['customerFirstName'] + values['customerLastName']}-FiberAgreement.docx"
+        
         doc.save(output_path)
         sg.popup("File saved", f"File has been saved here: {output_path}")
 
